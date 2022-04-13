@@ -6,3 +6,5 @@ def decodeMessageToObject(message):
     decodedMessageObject = json.loads(decodedMessage)
     
     return decodedMessageObject
+
+def encodeMessageToBinary(clientData): return json.dumps(clientData).encode("utf-8")

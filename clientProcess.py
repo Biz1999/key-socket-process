@@ -1,12 +1,25 @@
+import socket
+from decodeMessage import encodeMessageToBinary
+
+
 def main():
     initialCode, n = readInput()
     
-    message = {
-        "initialCode": initialCode,
-        "n": n
-    }
+    message = {"initialCode": initialCode, "n": n}
+    
+    clientSocket = socket.socket()         
+    host = socket.gethostname() 
+    port = 12345                
 
-    print(message)
+    print('Connecting to ', host, port)
+    clientSocket.connect((host, port))
+
+    while True:
+        clientSocket.send(encodeMessageToBinary(message))
+        msg = clientSocket.recv(1024)
+        print('SERVER >> ', msg.decode("utf-8"))
+        #s.close                     # Close the socket when done
+
 
 def readInput():
     initialCode = int(input("Insira o código inicial: "))
