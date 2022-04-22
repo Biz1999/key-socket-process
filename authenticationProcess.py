@@ -27,19 +27,20 @@ def main():
 
 def checkRequestData(server: Socket, address: tuple, clientData) -> None:
     if (validateData(clientData)):
-            logger.info(f"Objeto={clientData}, de {address} validado.")
-
-            encodedMessage = encodeMessageToBinary(clientData)
-
-            logger.info(f"Criando chave para {address}")
-
-            createKeyResponse = createConnection(encodedMessage)
-
-            logger.info(f"Chave criada para {address}. -> [key: {createKeyResponse}]")
-
-            server.connection.send(encodeResponseToBinary(createKeyResponse))
-    else:
         logger.info(f"Objeto={clientData}, de {address} validado.")
+
+        encodedMessage = encodeMessageToBinary(clientData)
+
+        logger.info(f"Criando chave para {address}")
+
+        createKeyResponse = createConnection(encodedMessage)
+
+        logger.info(f"Chave criada para {address}. -> [key: {createKeyResponse}]")
+
+        server.connection.send(encodeResponseToBinary(createKeyResponse))
+
+    else:
+        logger.error(f"Objeto={clientData}, de {address} com valores incorretos.")
         server.connection.send(encodeResponseToBinary("valores incorretos"))
         server.connection.close()
 

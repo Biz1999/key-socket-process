@@ -49,9 +49,7 @@ def checkMinimumPrimeNumber(initialCode, n):
     actualNumber = initialCode
 
     while(primesCount < n):
-        if (actualNumber % 2 == 0):
-            pass
-        elif(isprime(actualNumber)):
+        if(isprime(actualNumber)):
             primesCount += 1
             
         actualNumber -= 1
@@ -64,9 +62,7 @@ def checkMaximumPrimeNumber(initialCode, n):
     actualNumber = initialCode
 
     while(primesCount < n):
-        if (actualNumber % 2 == 0):
-            pass
-        elif(isprime(actualNumber)):
+        if(isprime(actualNumber)):
             primesCount += 1
             
         actualNumber += 1
