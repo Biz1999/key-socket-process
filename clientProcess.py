@@ -1,7 +1,9 @@
 from Socket import Socket
+from Logger import Logger
 from decodeMessage import encodeMessageToBinary
 
 def main():
+    # TODO revisar logs para deixar na main
     initialCode, n = readInput()
 
     message = {"initialCode": initialCode, "n": n}
@@ -16,17 +18,15 @@ def readInput():
     return initialCode, n
 
 def createConnection(encodedMessage: bin) -> None:
-    clientSocket = Socket(12345)
+    clientSocket = Socket(8000)
 
     clientSocket.connect()
 
-    while True:
-        try:
-            clientSocket.send(encodedMessage)
-            messageReceived = clientSocket.recv()
-            print('SERVER >> ', messageReceived)
-        except:
-            print('Fechando conexão...')
-            clientSocket.close()
-            break
+    try:
+        clientSocket.send(encodedMessage)
+        messageReceived = clientSocket.recv()
+        print('SERVER >> ', messageReceived)
+    except:
+        print('Erro na conexão...')
+        clientSocket.close()
 main()

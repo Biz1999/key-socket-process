@@ -3,24 +3,18 @@ import logging
 class Logger:
 
   def __init__(self):
-
-        # create logger
-    self.logger = logging.getLogger()
+    self.logger = logging.getLogger("my_logger")
     self.logger.setLevel(logging.DEBUG)
+    
+    if not self.logger.handlers:
+      self.ch = logging.StreamHandler()
+      self.ch.setLevel(logging.DEBUG)
 
-    # create console handler and set level to debug
-    self.ch = logging.StreamHandler()
-    self.ch.setLevel(logging.DEBUG)
+      self.formatter = logging.Formatter("%(asctime)s.%(msecs)03d - %(levelname)s : %(message)s","%Y-%m-%d %H:%M:%S")
 
-    # create formatter
-    self.formatter = logging.Formatter("%(asctime)s - %(levelname)s : %(message)s",
-                                  "%Y-%m-%d %H:%M:%S")
+      self.ch.setFormatter(self.formatter)
 
-    # add formatter to ch
-    self.ch.setFormatter(self.formatter)
-
-    # add ch to logger
-    self.logger.addHandler(self.ch)
+      self.logger.addHandler(self.ch)
 
 
   def info(self, message: str) -> None:

@@ -7,36 +7,40 @@ from decodeMessage import *
 logger: Logger = Logger()
 
 def main():
-    server = Socket(12345)
+    server = Socket(8080)
     server.initializeServer()
 
     while True:
-        connection = server.bindClient()
+        connection, adress = server.bindClient()
 
-        message = server.connection.recv(1024)
+        message = connection.recv(512)
+
+        logger.info(f"Conexão recebida de {adress}...")
 
         clientData = decodeMessageToObject(message)
 
+        logger.info(f"Gerando nova chave com objeto={clientData}...")
+
         key = createKey(clientData)
 
-        server.connection.send(encodeResponseToBinary(key))
+        logger.info(f"Chave gerada! -> [key:{key}]")
 
-        server.connection.close()
+        connection.send(encodeResponseToBinary(key))
+
+        connection.close()
+
+        logger.info(f"Conexão fechada de {adress}...")
 
 
 def createKey(clientData) -> int:
     initialCode = clientData["initialCode"]
     n = clientData["n"]
 
-    logger.info(f"Gerando nova chave com objeto={clientData}...")
-
     minimumPrime = checkMinimumPrimeNumber(initialCode, n)
     maximumPrime = checkMaximumPrimeNumber(initialCode, n)
 
     newKey = generateKey(minimumPrime, maximumPrime)
-
-    logger.info(f"Chave gerada! -> [key:{newKey}]")
-
+    
     return newKey
 
 
