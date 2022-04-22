@@ -8,3 +8,5 @@ def decodeMessageToObject(message):
     return decodedMessageObject
 
 def encodeMessageToBinary(clientData): return json.dumps(clientData).encode("utf-8")
+
+def encodeResponseToBinary(message: any): return str(message).encode("utf-8")
