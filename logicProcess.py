@@ -3,6 +3,7 @@ from datetime import datetime
 from Socket import Socket
 from Logger import Logger
 from decodeMessage import *
+from threading import Thread
 
 logger: Logger = Logger()
 
@@ -13,23 +14,29 @@ def main():
     while True:
         connection, adress = server.bindClient()
 
-        message = connection.recv(512)
+        #Thread(target=initializeThread, args=(server, adress)).start()
+        initializeThread(server, adress)
 
-        logger.info(f"Conexão recebida de {adress}...")
+def initializeThread(server, adress):
 
-        clientData = decodeMessageToObject(message)
+    message = server.connection.recv(512)
 
-        logger.info(f"Gerando nova chave com objeto={clientData}...")
+    logger.info(f"Conexão recebida de {adress}...")
 
-        key = createKey(clientData)
+    clientData = decodeMessageToObject(message)
 
-        logger.info(f"Chave gerada! -> [key:{key}]")
+    logger.info(f"Gerando nova chave com objeto={clientData}...")
 
-        connection.send(encodeResponseToBinary(key))
+    key = createKey(clientData)
 
-        connection.close()
+    logger.info(f"Chave gerada! -> [key:{key}]")
 
-        logger.info(f"Conexão fechada de {adress}...")
+    server.connection.send(encodeResponseToBinary(key))
+
+    server.connection.close()
+
+    logger.info(f"Conexão fechada de {adress}...")
+
 
 
 def createKey(clientData) -> int:

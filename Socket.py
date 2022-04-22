@@ -15,7 +15,7 @@ class Socket:
     logger.info('Esperando por clientes...')   # Establish connection with client.
 
     self.server.bind((self.host, self.port))
-    self.server.listen()
+    self.server.listen(1)
   
   def bindClient(self) -> socket.socket and tuple:
     self.connection, self.address = self.server.accept()

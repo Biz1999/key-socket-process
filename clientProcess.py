@@ -1,11 +1,15 @@
 from Socket import Socket
 from Logger import Logger
 from decodeMessage import encodeMessageToBinary
+from threading import Thread
+
 
 logger = Logger()
 
 def main():
-    initialCode, n = readInput()
+    #initialCode, n = readInput()
+
+    initialCode, n = 100000000, 14000
 
     message = {"initialCode": initialCode, "n": n}
 
@@ -28,6 +32,8 @@ def readInput():
 
 
 def createConnection(encodedMessage: bin) -> str:
+
+    
     clientSocket = Socket(8000)
 
     clientSocket.connect()
@@ -40,4 +46,9 @@ def createConnection(encodedMessage: bin) -> str:
     except:
         logger.error("f")
         clientSocket.close()
-main()
+
+
+#main()
+
+for i in range(3):
+    Thread(target=main).start()

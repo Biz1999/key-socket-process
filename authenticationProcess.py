@@ -2,6 +2,7 @@ import json
 from decodeMessage import *
 from Logger import Logger
 from Socket import Socket
+from threading import Thread 
 
 logger = Logger()
 
@@ -13,17 +14,23 @@ def main():
     while True:
         connection, address = server.bindClient()
 
-        message = connection.recv(512)
+        #Thread(target=initializeThread, args=(server, address,)).start()
+        initializeThread(server, address)
 
-        logger.info(f"Conexão recebida de {address}...")
+        
 
-        clientData = decodeMessageToObject(message)
+def initializeThread(server, address):
 
-        logger.info(f"Validando objeto={clientData}...")
+    message = server.connection.recv(512)
 
-        checkRequestData(server, address, clientData)
+    logger.info(f"Conexão recebida de {address}...")
 
-        connection.close()
+    clientData = decodeMessageToObject(message)
+
+    logger.info(f"Validando objeto={clientData}...")
+
+    checkRequestData(server, address, clientData)
+
 
 def checkRequestData(server: Socket, address: tuple, clientData) -> None:
     if (validateData(clientData)):
@@ -38,6 +45,7 @@ def checkRequestData(server: Socket, address: tuple, clientData) -> None:
         logger.info(f"Chave criada para {address}. -> [key: {createKeyResponse}]")
 
         server.connection.send(encodeResponseToBinary(createKeyResponse))
+        server.connection.close()
 
     else:
         logger.error(f"Objeto={clientData}, de {address} com valores incorretos.")
