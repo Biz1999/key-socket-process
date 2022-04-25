@@ -1,9 +1,8 @@
+import concurrent.futures
 from sympy import isprime
-from datetime import datetime
 from Socket import Socket
 from Logger import Logger
 from decodeMessage import *
-from threading import Thread
 
 logger: Logger = Logger()
 
@@ -11,15 +10,18 @@ def main():
     server = Socket(8080)
     server.initializeServer()
 
-    while True:
-        connection, adress = server.bindClient()
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        while True:
+            connection, adress = server.bindClient()
+            executor.submit(initializeThread, server, connection, adress)
+    # while True:
+    #     connection, adress = server.bindClient()
+    #     initializeThread(server, connection, adress)
 
-        #Thread(target=initializeThread, args=(server, adress)).start()
-        initializeThread(server, adress)
 
-def initializeThread(server, adress):
+def initializeThread(server, connection, adress):
 
-    message = server.connection.recv(512)
+    message = connection.recv(512)
 
     logger.info(f"Conexão recebida de {adress}...")
 
@@ -29,14 +31,13 @@ def initializeThread(server, adress):
 
     key = createKey(clientData)
 
-    logger.info(f"Chave gerada! -> [key:{key}]")
+    logger.info(f"Chave gerada! -> [key:{key}] para {adress}")
 
-    server.connection.send(encodeResponseToBinary(key))
+    connection.send(encodeResponseToBinary(key))
 
-    server.connection.close()
+    connection.close()
 
     logger.info(f"Conexão fechada de {adress}...")
-
 
 
 def createKey(clientData) -> int:
@@ -47,8 +48,20 @@ def createKey(clientData) -> int:
     maximumPrime = checkMaximumPrimeNumber(initialCode, n)
 
     newKey = generateKey(minimumPrime, maximumPrime)
-    
+
     return newKey
+
+    # with concurrent.futures.ThreadPoolExecutor() as executor:
+    #     minimumPrime = executor.submit(checkMinimumPrimeNumber, initialCode, n)
+    #     maximumPrime = executor.submit(checkMaximumPrimeNumber, initialCode, n)
+    #     minimumPrimeResult = minimumPrime.result()
+    #     maximumPrimeResult = maximumPrime.result()
+    #     # minimumPrime = checkMinimumPrimeNumber(initialCode, n)
+    #     # maximumPrime = checkMaximumPrimeNumber(initialCode, n)
+
+    #     newKey = generateKey(minimumPrimeResult, maximumPrimeResult)
+        
+    #     return newKey
 
 
 def checkMinimumPrimeNumber(initialCode, n):

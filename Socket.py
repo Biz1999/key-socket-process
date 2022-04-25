@@ -1,11 +1,12 @@
-import socket
+from socket import *
 from Logger import Logger
 
 logger = Logger()
 class Socket:
 
   def __init__(self, port):
-    self.server = socket.socket()
+    self.server = socket(AF_INET, SOCK_STREAM)
+    self.server.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     self.port = port
     self.host = "0.0.0.0"
 
@@ -15,15 +16,15 @@ class Socket:
     logger.info('Esperando por clientes...')   # Establish connection with client.
 
     self.server.bind((self.host, self.port))
-    self.server.listen(1)
+    self.server.listen(100)
   
-  def bindClient(self) -> socket.socket and tuple:
+  def bindClient(self) -> socket and tuple:
     self.connection, self.address = self.server.accept()
 
     return self.connection, self.address
 
   def connect(self):
-    hostName = socket.gethostname()
+    hostName = gethostname()
     logger.info(f'Conectando a porta {self.port}...')
     self.server.connect((hostName, self.port))
 

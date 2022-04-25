@@ -1,4 +1,5 @@
 import json
+import concurrent.futures
 from decodeMessage import *
 from Logger import Logger
 from Socket import Socket
@@ -11,17 +12,19 @@ def main():
     server = Socket(8000)
     server.initializeServer()
 
-    while True:
-        connection, address = server.bindClient()
 
-        #Thread(target=initializeThread, args=(server, address,)).start()
-        initializeThread(server, address)
+    # while True:
+    #     connection, adress = server.bindClient()
+    #     initializeThread(server, connection, adress)
 
-        
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        while True:
+            connection, adress = server.bindClient()
+            executor.submit(initializeThread, server, connection, adress)
 
-def initializeThread(server, address):
+def initializeThread(server, connection, address):
 
-    message = server.connection.recv(512)
+    message = connection.recv(512)
 
     logger.info(f"Conexão recebida de {address}...")
 
@@ -29,10 +32,10 @@ def initializeThread(server, address):
 
     logger.info(f"Validando objeto={clientData}...")
 
-    checkRequestData(server, address, clientData)
+    checkRequestData(server, address, connection, clientData)
 
 
-def checkRequestData(server: Socket, address: tuple, clientData) -> None:
+def checkRequestData(server: Socket, address: tuple, connection, clientData) -> None:
     if (validateData(clientData)):
         logger.info(f"Objeto={clientData}, de {address} validado.")
 
@@ -44,13 +47,13 @@ def checkRequestData(server: Socket, address: tuple, clientData) -> None:
 
         logger.info(f"Chave criada para {address}. -> [key: {createKeyResponse}]")
 
-        server.connection.send(encodeResponseToBinary(createKeyResponse))
-        server.connection.close()
+        connection.send(encodeResponseToBinary(createKeyResponse))
+        connection.close()
 
     else:
         logger.error(f"Objeto={clientData}, de {address} com valores incorretos.")
-        server.connection.send(encodeResponseToBinary("valores incorretos"))
-        server.connection.close()
+        connection.send(encodeResponseToBinary("valores incorretos"))
+        connection.close()
 
 def validateData(data):
     initialCode = data["initialCode"]
