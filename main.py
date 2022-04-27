@@ -4,6 +4,7 @@ from random import randint
 from Logger import Logger
 from clientProcess import startKeyCreation
 
+CLIENT_NUMBER_IN_FAST_TIME = 22
 
 logger: Logger = Logger()
 
@@ -13,6 +14,7 @@ def main():
   while True:
     print("\n1 - Processo individual")
     print("2 - Processo com múltiplos clientes")
+    print("3 - Processo mais rápido")
     print("Outro - Sair")
     choice = int(input("Escolha: "))
 
@@ -22,6 +24,8 @@ def main():
     elif(choice == 2):
       executeMultiThreadProcesses()
       sleep(1)
+    elif(choice == 3):
+      executeFastProcesses()
     else:
       break
 
@@ -57,14 +61,14 @@ def executeMultiThreadProcesses():
   clientsData = []
 
   for _ in range(clients):
-    initialCode = randint(0, endCode)
+    initialCode = randint(10000000, endCode)
     n = randint(5000, 15000)
     clientsData.append({"initialCode": initialCode, "n": n})
 
   countdown()
   startTime = time()
 
-  with concurrent.futures.ThreadPoolExecutor() as executor:
+  with concurrent.futures.ProcessPoolExecutor() as executor:
     for i in range(clients):
       initialCode = clientsData[i]["initialCode"]
       n = clientsData[i]["n"]
@@ -90,6 +94,22 @@ def readClientsInput():
       return endCode, clients
     except:
       logger.error("Insira novamente os valores")
+
+def executeFastProcesses():
+  print("Rodando com o valor inicial 10000000...")
+  print("Rodando com o n = 5000...")
+  print(f"Rodando com {CLIENT_NUMBER_IN_FAST_TIME} clientes")
+  countdown()
+  startTime = time()
+
+  with concurrent.futures.ProcessPoolExecutor() as executor:
+    for _ in range (CLIENT_NUMBER_IN_FAST_TIME):
+      executor.submit(startKeyCreation, 10000000, 5000)
+
+  runtime = ("%.3f" % (time() - startTime))
+
+  logger.info(f"Tempo percorrido - {runtime}s")
+
 
 def countdown():
   seconds = 3
